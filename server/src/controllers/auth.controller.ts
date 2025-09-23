@@ -78,7 +78,7 @@ export const authController = {
           .json({ success: false, message: "Mật khẩu không khớp!" });
 
       const accessToken = generateAccessToken(user.id, user.role);
-      const refreshToken = generateAccessToken(user.id, user.role);
+      const refreshToken = generateRefreshToken(user.id, user.role);
 
       await prisma.user.update({
         where: { id: user.id },
@@ -152,11 +152,10 @@ export const authController = {
             return res
               .status(403)
               .json({ success: false, message: "Refresh token hết hạn!" });
+          const accessToken = generateAccessToken(user.id, user.role);
+          return res.json({ success: true, accessToken });
         }
       );
-
-      const accessToken = generateAccessToken(user.id, user.role);
-      return res.json({ success: true, accessToken });
     } catch (error) {
       console.error("Lỗi refresh token: ", error);
       res.status(500).json({ success: false, message: "Lỗi server cục bộ" });
