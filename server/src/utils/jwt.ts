@@ -1,11 +1,16 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "ksndknasdn23123";
+const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
 
-const generateToken = (userId: string) => {
-  return jwt.sign({ userId }, JWT_SECRET, {
-    expiresIn: "1d",
-  });
+export const generateAccessToken = (userId: string, role: string): string => {
+  return jwt.sign({ userId, role }, JWT_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRE as string,
+  } as SignOptions);
 };
 
-export default generateToken;
+export const generateRefreshToken = (userId: string, role: string): string => {
+  return jwt.sign({ userId, role }, JWT_REFRESH_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRE as string, 
+  } as SignOptions);
+};
