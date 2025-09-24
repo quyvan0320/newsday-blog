@@ -19,8 +19,13 @@ model User {
   email        String   @unique
   password     String
   avatar_url   String?
-  role         String   @default("user")
+  role         Role     @default(user)
   refreshToken String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  user
+  admin
 }

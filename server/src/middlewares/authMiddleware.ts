@@ -6,7 +6,14 @@ interface AuthRequest extends Request {
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export const authMiddleware = (
+export const decodedToken = (token: string) => {
+  return jwt.verify(token, JWT_SECRET) as {
+    userId: string;
+    role: string;
+  };
+};
+
+export const authenticate = (
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -19,13 +26,11 @@ export const authMiddleware = (
         .json({ success: false, message: "Không có token!" });
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      role: string;
-    };
+    const decoded = decodedToken(token);
     req.user = { id: decoded.userId, role: decoded.role };
     next();
   } catch (error) {
+    console.error("JWT decoded error: ", error);
     return res
       .status(403)
       .json({ success: false, message: "Token không hợp lệ" });
