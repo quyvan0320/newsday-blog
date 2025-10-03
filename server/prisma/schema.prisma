@@ -14,16 +14,70 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  username     String   
-  email        String   @unique
+  id           String    @id @default(cuid())
+  username     String
+  email        String    @unique
   password     String
   avatar_url   String?
-  role         Role     @default(user)
+  role         Role      @default(user)
   refreshToken String?
   bio          String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Post {
+  id         String     @id @default(cuid())
+  title      String
+  slug       String     @unique
+  thumnail   String
+  content    String
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   String
+  comments   Comment[]
+  likes      Like[]
+  categories Category[] @relation("PostCategories")
+  tags       Tag[]      @relation("PostTags")
+  published  Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[] @relation("PostCategories")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  posts Post[] @relation("PostTags")
 }
 
 enum Role {
